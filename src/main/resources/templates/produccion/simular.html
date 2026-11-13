@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Producción | Madre Masa</title>
+    <link rel="stylesheet" href="../../static/css/estilos.css" th:href="@{/css/estilos.css}">
+</head>
+<body>
+    <header th:replace="~{fragmentos/plantilla :: encabezado('produccion')}"></header>
+
+    <main class="contenedor contenedor-ancho">
+        <h1>Producción</h1>
+        <p>Calcule los insumos necesarios para producir una receta y verifique si alcanzan las existencias
+           antes de iniciar la producción. Esta simulación no modifica el inventario.</p>
+
+        <section class="tarjeta-formulario">
+            <form th:action="@{/produccion/simular}" method="post" class="formulario-linea">
+                <div class="campo">
+                    <label for="idReceta">Receta</label>
+                    <select id="idReceta" name="idReceta" required>
+                        <option value="">Seleccione una receta</option>
+                        <option th:each="r : ${recetas}" th:value="${r.idReceta}"
+                                th:selected="${r.idReceta == idReceta}"
+                                th:text="${r.producto.nombre + ' (' + r.rendimiento + ' u/tanda)'}">Pan de masa madre clásico (12 u/tanda)</option>
+                    </select>
+                </div>
+                <div class="campo">
+                    <label for="tandas">Tandas</label>
+                    <input type="number" id="tandas" name="tandas" min="1" max="50" required th:value="${tandas}" value="1">
+                </div>
+                <button type="submit">Calcular insumos</button>
+            </form>
+        </section>
+
+        <div th:replace="~{fragmentos/plantilla :: mensajes}"></div>
+
+        <!-- Resultado de la simulación -->
+        <th:block th:if="${necesidades}">
+            <article class="mensaje mensaje-exito" role="status" th:if="${alcanza}">
+                <span class="mensaje-icono" aria-hidden="true">✔</span>
+                <div class="mensaje-contenido">
+                    <h2>Hay insumos suficientes</h2>
+                    <p>Las existencias alcanzan para producir las tandas indicadas.</p>
+                </div>
+            </article>
+            <article class="mensaje mensaje-error" role="alert" th:unless="${alcanza}">
+                <span class="mensaje-icono" aria-hidden="true">✖</span>
+                <div class="mensaje-contenido">
+                    <h2>No se puede producir esta cantidad</h2>
+                    <p>Faltan insumos. Registre una entrada de inventario o ajuste la cantidad a producir.</p>
+                </div>
+            </article>
+
+            <div class="tabla-contenedor">
+                <table class="tabla">
+                    <thead>
+                        <tr><th>Insumo</th><th class="numero">Requerido</th><th class="numero">Disponible</th>
+                            <th class="numero">Faltante</th><th>Estado</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="n : ${necesidades}" th:classappend="${!n.alcanza()} ? 'fila-faltante'">
+                            <td th:text="${n.insumo()}">Harina integral</td>
+                            <td class="numero"><span th:text="${#numbers.formatInteger(n.requerido(), 1, 'POINT')}">4.000</span> <span th:text="${n.simbolo()}">g</span></td>
+                            <td class="numero"><span th:text="${#numbers.formatInteger(n.disponible(), 1, 'POINT')}">1.500</span> <span th:text="${n.simbolo()}">g</span></td>
+                            <td class="numero"><span th:text="${#numbers.formatInteger(n.faltante(), 1, 'POINT')}">2.500</span> <span th:text="${n.simbolo()}">g</span></td>
+                            <td>
+                                <span class="etiqueta etiqueta-ok" th:if="${n.alcanza()}">Alcanza</span>
+                                <span class="etiqueta etiqueta-baja" th:unless="${n.alcanza()}">Falta</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </th:block>
+
+        <section class="bloque">
+            <h2>Producciones recientes</h2>
+            <div class="tabla-contenedor">
+                <table class="tabla">
+                    <thead>
+                        <tr><th>Fecha</th><th>Producto</th><th class="numero">Tandas</th><th class="numero">Unidades</th>
+                            <th class="numero" sec:authorize="hasRole('ADMINISTRADOR')">Costo</th><th>Estado</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="p : ${producciones}">
+                            <td th:text="${#temporals.format(p.fecha, 'dd/MM/yyyy HH:mm')}">06/11/2026 06:30</td>
+                            <td th:text="${p.receta.producto.nombre}">Pan de masa madre clásico</td>
+                            <td class="numero" th:text="${p.tandas}">1</td>
+                            <td class="numero" th:text="${p.unidadesProducidas}">12</td>
+                            <td class="numero" sec:authorize="hasRole('ADMINISTRADOR')">₡<span th:text="${#numbers.formatDecimal(p.costoTotal, 1, 'POINT', 2, 'COMMA')}">6.380,40</span></td>
+                            <td th:text="${p.estado == 'CONFIRMADA'} ? 'Confirmada' : 'Anulada'">Confirmada</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <footer th:replace="~{fragmentos/plantilla :: pie}"></footer>
+</body>
+</html>
