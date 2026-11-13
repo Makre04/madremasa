@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte de ventas | Madre Masa</title>
+    <link rel="stylesheet" href="../../static/css/estilos.css" th:href="@{/css/estilos.css}">
+</head>
+<body>
+    <header th:replace="~{fragmentos/plantilla :: encabezado('ventas')}"></header>
+
+    <main class="contenedor contenedor-ancho">
+        <h1>Reporte de ventas por punto de venta</h1>
+
+        <section class="indicadores">
+            <article class="indicador">
+                <h2>Total vendido</h2>
+                <p class="indicador-valor">₡<span th:text="${#numbers.formatDecimal(totalGeneral, 1, 'POINT', 0, 'COMMA')}">75.200</span></p>
+            </article>
+            <article class="indicador">
+                <h2>Cierres registrados</h2>
+                <p class="indicador-valor" th:text="${#lists.size(cierres)}">1</p>
+            </article>
+        </section>
+
+        <section class="bloque">
+            <h2>Totales por punto de venta</h2>
+            <div class="tabla-contenedor">
+                <table class="tabla">
+                    <thead>
+                        <tr><th>Punto de venta</th><th class="numero">Cierres</th><th class="numero">Efectivo</th>
+                            <th class="numero">Datáfono</th><th class="numero">Total</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="r : ${resumen}">
+                            <td th:text="${r.puntoVenta()}">Feria A</td>
+                            <td class="numero" th:text="${r.cierres()}">1</td>
+                            <td class="numero">₡<span th:text="${#numbers.formatDecimal(r.efectivo(), 1, 'POINT', 0, 'COMMA')}">45.200</span></td>
+                            <td class="numero">₡<span th:text="${#numbers.formatDecimal(r.datafono(), 1, 'POINT', 0, 'COMMA')}">30.000</span></td>
+                            <td class="numero"><strong>₡<span th:text="${#numbers.formatDecimal(r.total(), 1, 'POINT', 0, 'COMMA')}">75.200</span></strong></td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(resumen)}"><td colspan="5">No hay cierres registrados.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="bloque">
+            <h2>Unidades vendidas por producto</h2>
+            <div class="tabla-contenedor">
+                <table class="tabla">
+                    <thead><tr><th>Producto</th><th class="numero">Unidades</th></tr></thead>
+                    <tbody>
+                        <tr th:each="p : ${productos}">
+                            <td th:text="${p.producto()}">Pan de masa madre clásico</td>
+                            <td class="numero" th:text="${p.unidades()}">20</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <footer th:replace="~{fragmentos/plantilla :: pie}"></footer>
+</body>
+</html>
