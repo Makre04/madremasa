@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usuarios | Madre Masa</title>
+    <link rel="stylesheet" href="../../static/css/estilos.css" th:href="@{/css/estilos.css}">
+</head>
+<body>
+    <header th:replace="~{fragmentos/plantilla :: encabezado('usuarios')}"></header>
+
+    <main class="contenedor contenedor-ancho">
+        <h1>Usuarios</h1>
+        <div class="tabla-contenedor">
+            <table class="tabla">
+                <thead>
+                    <tr><th>Código</th><th>Nombre</th><th>Rol</th><th>Estado</th></tr>
+                </thead>
+                <tbody>
+                    <tr th:each="u : ${usuarios}" th:classappend="${!u.activo} ? 'fila-inactiva'">
+                        <td th:text="${u.codigoEmpleado}">EMP-001</td>
+                        <td th:text="${u.nombreCompleto}">Administradora de prueba</td>
+                        <td th:text="${u.rol.nombreVisible}">Administrador</td>
+                        <td>
+                            <span class="etiqueta etiqueta-ok" th:if="${u.activo}">Activo</span>
+                            <span class="etiqueta" th:unless="${u.activo}">Inactivo</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="nota">Las contraseñas se guardan cifradas con BCrypt y nunca se muestran.</p>
+    </main>
+
+    <footer th:replace="~{fragmentos/plantilla :: pie}"></footer>
+</body>
+</html>
