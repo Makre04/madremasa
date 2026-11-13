@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mensajes del sistema | Madre Masa</title>
+    <link rel="stylesheet" href="../static/css/estilos.css" th:href="@{/css/estilos.css}">
+</head>
+<body>
+    <header class="encabezado">
+        <p class="logo">Madre Masa</p>
+    </header>
+
+    <main class="contenedor">
+        <h1>Mensajes del sistema</h1>
+
+        <!-- Se muestra solo cuando se llega desde el formulario de login -->
+        <p class="bienvenida" th:if="${codigo != null and !#strings.isEmpty(codigo)}">
+            Sesión iniciada con el código <strong th:text="${codigo}">EMP-014</strong>
+        </p>
+
+        <!-- Mensaje de éxito -->
+        <article class="mensaje mensaje-exito" role="status">
+            <span class="mensaje-icono" aria-hidden="true">✔</span>
+            <div class="mensaje-contenido">
+                <h2>Producción registrada</h2>
+                <p>Se registraron 24 unidades de pan de masa madre clásico. El inventario de insumos se actualizó correctamente.</p>
+            </div>
+        </article>
+
+        <!-- Mensaje de error -->
+        <article class="mensaje mensaje-error" role="alert">
+            <span class="mensaje-icono" aria-hidden="true">✖</span>
+            <div class="mensaje-contenido">
+                <h2>No se pudo registrar la producción</h2>
+                <p>No hay suficiente harina integral para completar la receta. Faltan 2,5 kg. Registre una entrada de inventario o ajuste la cantidad a producir.</p>
+            </div>
+        </article>
+
+        <!-- Mensaje de advertencia -->
+        <article class="mensaje mensaje-advertencia" role="status">
+            <span class="mensaje-icono" aria-hidden="true">⚠</span>
+            <div class="mensaje-contenido">
+                <h2>Inventario bajo</h2>
+                <p>Quedan 3 kg de harina de trigo, por debajo del mínimo de 10 kg. Se recomienda reponerla antes de la producción de mañana.</p>
+            </div>
+        </article>
+
+        <a class="enlace-volver" href="login.html" th:href="@{/login}">← Volver al inicio de sesión</a>
+    </main>
+
+    <footer class="pie">
+        <p>&copy; <span th:text="${#temporals.year(#temporals.createNow())}">2026</span> Panadería Madre Masa</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso denegado | Madre Masa</title>
+    <link rel="stylesheet" href="../static/css/estilos.css" th:href="@{/css/estilos.css}">
+</head>
+<body>
+    <header th:replace="~{fragmentos/plantilla :: encabezado('')}"></header>
+
+    <main class="contenedor">
+        <article class="mensaje mensaje-error" role="alert">
+            <span class="mensaje-icono" aria-hidden="true">✖</span>
+            <div class="mensaje-contenido">
+                <h2>Acceso denegado</h2>
+                <p>Su rol no tiene permiso para abrir esta página.</p>
+            </div>
+        </article>
+        <a class="enlace-volver" th:href="@{/panel}" href="panel.html">← Volver al panel</a>
+    </main>
+
+    <footer th:replace="~{fragmentos/plantilla :: pie}"></footer>
+</body>
+</html>

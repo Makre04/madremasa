@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel principal | Madre Masa</title>
+    <link rel="stylesheet" href="../static/css/estilos.css" th:href="@{/css/estilos.css}">
+</head>
+<body>
+    <header th:replace="~{fragmentos/plantilla :: encabezado('panel')}"></header>
+
+    <main class="contenedor contenedor-ancho">
+        <h1>Panel principal</h1>
+        <p class="bienvenida" th:if="${usuario}">
+            Bienvenido, <strong th:text="${usuario.nombreCompleto}">Administradora de prueba</strong>
+            · <span th:text="${usuario.rol.nombreVisible}">Administrador</span>
+        </p>
+
+        <!-- Indicadores para administración y producción -->
+        <section class="indicadores" sec:authorize="hasAnyRole('ADMINISTRADOR','PRODUCCION')">
+            <article class="indicador">
+                <h2>Insumos registrados</h2>
+                <p class="indicador-valor" th:text="${totalInsumos}">7</p>
+                <a th:href="@{/insumos}" href="insumos/lista.html">Ver inventario</a>
+            </article>
+            <article class="indicador" th:classappend="${!#lists.isEmpty(insumosBajos)} ? 'indicador-alerta'">
+                <h2>Inventario bajo</h2>
+                <p class="indicador-valor" th:text="${#lists.size(insumosBajos)}">2</p>
+                <a th:href="@{/insumos}" href="insumos/lista.html">Revisar insumos</a>
+            </article>
+            <article class="indicador" sec:authorize="hasRole('ADMINISTRADOR')">
+                <h2>Ventas registradas</h2>
+                <p class="indicador-valor">₡<span th:text="${#numbers.formatDecimal(totalVentas, 1, 'POINT', 0, 'COMMA')}">75.200</span></p>
+                <a th:href="@{/ventas}" href="ventas/reporte.html">Ver reporte</a>
+            </article>
+        </section>
+
+        <!-- Advertencia de inventario bajo (RF-12) -->
+        <article class="mensaje mensaje-advertencia" role="status"
+                 sec:authorize="hasAnyRole('ADMINISTRADOR','PRODUCCION')" th:if="${!#lists.isEmpty(insumosBajos)}">
+            <span class="mensaje-icono" aria-hidden="true">⚠</span>
+            <div class="mensaje-contenido">
+                <h2>Inventario bajo</h2>
+                <p>Los siguientes insumos están en su cantidad mínima o por debajo de ella:
+                    <span th:each="i, estado : ${insumosBajos}">
+                        <strong th:text="${i.nombre}">Harina de trigo</strong>
+                        (<span th:text="${#numbers.formatInteger(i.existencia, 1, 'POINT')}">3.000</span>
+                        <span th:text="${i.unidad.simbolo}">g</span>)<span th:text="${estado.last} ? '.' : ', '">, </span>
+                    </span>
+                </p>
+            </div>
+        </article>
+
+        <section class="bloque" sec:authorize="hasAnyRole('ADMINISTRADOR','PRODUCCION')">
+            <h2>Producción reciente</h2>
+            <div class="tabla-contenedor">
+                <table class="tabla">
+                    <thead>
+                        <tr><th>Fecha</th><th>Producto</th><th>Tandas</th><th>Unidades</th><th>Responsable</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="p : ${producciones}">
+                            <td th:text="${#temporals.format(p.fecha, 'dd/MM/yyyy HH:mm')}">06/11/2026 06:30</td>
+                            <td th:text="${p.receta.producto.nombre}">Pan de masa madre clásico</td>
+                            <td th:text="${p.tandas}">1</td>
+                            <td th:text="${p.unidadesProducidas}">12</td>
+                            <td th:text="${p.usuario.nombreCompleto}">Panadero de prueba</td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(producciones)}"><td colspan="5">No hay producciones registradas.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Vista del empleado de punto de venta -->
+        <section class="bloque" sec:authorize="hasRole('PUNTO_VENTA')">
+            <h2>Mis cierres de jornada</h2>
+            <p th:if="${#lists.isEmpty(misCierres)}">Todavía no tiene cierres registrados.</p>
+            <p th:unless="${#lists.isEmpty(misCierres)}">
+                Tiene <strong th:text="${#lists.size(misCierres)}">1</strong> cierre(s) registrado(s).
+                <a th:href="@{/cierres}" href="cierres/lista.html">Ver detalle</a>
+            </p>
+        </section>
+    </main>
+
+    <footer th:replace="~{fragmentos/plantilla :: pie}"></footer>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar sesión | Madre Masa</title>
+    <link rel="stylesheet" href="../static/css/estilos.css" th:href="@{/css/estilos.css}">
+</head>
+<body>
+    <header class="encabezado">
+        <p class="logo">Madre Masa</p>
+    </header>
+
+    <main class="contenedor-login">
+        <section class="tarjeta-login">
+            <h1>Iniciar sesión</h1>
+            <p>Ingrese su código de empleado y su contraseña para acceder al sistema.</p>
+
+            <!-- Mensaje cuando los datos no coinciden (no indica cuál dato falló) -->
+            <article class="mensaje mensaje-error" role="alert" th:if="${param.error}">
+                <span class="mensaje-icono" aria-hidden="true">✖</span>
+                <div class="mensaje-contenido">
+                    <h2>No se pudo iniciar sesión</h2>
+                    <p>El código de empleado o la contraseña no son correctos, o el usuario está inactivo.</p>
+                </div>
+            </article>
+
+            <!-- Mensaje después de cerrar sesión -->
+            <article class="mensaje mensaje-exito" role="status" th:if="${param.salida}">
+                <span class="mensaje-icono" aria-hidden="true">✔</span>
+                <div class="mensaje-contenido">
+                    <h2>Sesión cerrada</h2>
+                    <p>La sesión se cerró correctamente.</p>
+                </div>
+            </article>
+
+            <form id="form-login" method="post" action="mensajes.html" th:action="@{/login}">
+                <div class="campo">
+                    <label for="codigo">Código de empleado</label>
+                    <input type="text" id="codigo" name="codigo" autocomplete="username" required>
+                    <p class="campo-error">Ingrese su código de empleado</p>
+                </div>
+
+                <div class="campo">
+                    <label for="contrasena">Contraseña</label>
+                    <input type="password" id="contrasena" name="contrasena" autocomplete="current-password" required>
+                    <p class="campo-error">Ingrese su contraseña</p>
+                </div>
+
+                <button type="submit">Ingresar</button>
+            </form>
+        </section>
+    </main>
+
+    <footer class="pie">
+        <p>&copy; <span th:text="${#temporals.year(#temporals.createNow())}">2026</span> Panadería Madre Masa</p>
+    </footer>
+</body>
+</html>
