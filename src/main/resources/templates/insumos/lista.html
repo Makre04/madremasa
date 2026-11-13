@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insumos | Madre Masa</title>
+    <link rel="stylesheet" href="../../static/css/estilos.css" th:href="@{/css/estilos.css}">
+</head>
+<body>
+    <header th:replace="~{fragmentos/plantilla :: encabezado('insumos')}"></header>
+
+    <main class="contenedor contenedor-ancho">
+        <div class="titulo-con-accion">
+            <h1>Insumos e inventario</h1>
+            <a class="boton" sec:authorize="hasRole('ADMINISTRADOR')" th:href="@{/insumos/nuevo}" href="formulario.html">Nuevo insumo</a>
+        </div>
+
+        <div th:replace="~{fragmentos/plantilla :: mensajes}"></div>
+
+        <div class="tabla-contenedor">
+            <table class="tabla">
+                <thead>
+                    <tr>
+                        <th>Insumo</th><th class="numero">Existencia</th><th class="numero">Mínimo</th>
+                        <th>Unidad</th><th class="numero" sec:authorize="hasRole('ADMINISTRADOR')">Costo unitario</th>
+                        <th>Estado</th><th sec:authorize="hasRole('ADMINISTRADOR')">Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="i : ${insumos}" th:classappend="${!i.activo} ? 'fila-inactiva'">
+                        <td th:text="${i.nombre}">Harina de trigo</td>
+                        <td class="numero" th:text="${#numbers.formatInteger(i.existencia, 1, 'POINT')}">3.000</td>
+                        <td class="numero" th:text="${#numbers.formatInteger(i.cantidadMinima, 1, 'POINT')}">10.000</td>
+                        <td th:text="${i.unidad.simbolo}">g</td>
+                        <td class="numero" sec:authorize="hasRole('ADMINISTRADOR')">₡<span th:text="${#numbers.formatDecimal(i.costoUnitario, 1, 'POINT', 4, 'COMMA')}">0,9500</span></td>
+                        <td>
+                            <span class="etiqueta etiqueta-baja" th:if="${i.bajo and i.activo}">Inventario bajo</span>
+                            <span class="etiqueta etiqueta-ok" th:if="${!i.bajo and i.activo}">Suficiente</span>
+                            <span class="etiqueta" th:unless="${i.activo}">Inactivo</span>
+                        </td>
+                        <td sec:authorize="hasRole('ADMINISTRADOR')">
+                            <a th:href="@{/insumos/{id}/editar(id=${i.idInsumo})}" href="formulario.html">Editar</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="nota">Las cantidades se muestran en la unidad base de cada insumo (gramos, mililitros o unidades).</p>
+    </main>
+
+    <footer th:replace="~{fragmentos/plantilla :: pie}"></footer>
+</body>
+</html>
