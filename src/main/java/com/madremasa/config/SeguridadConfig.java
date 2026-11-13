@@ -6,6 +6,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.csrf.CsrfException;
 import org.springframework.security.web.SecurityFilterChain;
 
 // Inicio de sesión con código de empleado y control de acceso por rol (RF-01, RF-02, RNF-02)
@@ -35,7 +36,15 @@ public class SeguridadConfig {
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/login?salida")
                 .permitAll())
-            .exceptionHandling(error -> error.accessDeniedPage("/acceso-denegado"));
+            .exceptionHandling(error -> error.accessDeniedHandler((solicitud, respuesta, excepcion) -> {
+                // Un formulario con el token CSRF vencido (por ejemplo, la página de inicio quedó abierta antes de
+                // reiniciar la aplicación) vuelve al inicio de sesión con un aviso, en lugar de mostrar un error
+                if (excepcion instanceof CsrfException) {
+                    respuesta.sendRedirect(solicitud.getContextPath() + "/login?expirada");
+                } else {
+                    respuesta.sendRedirect(solicitud.getContextPath() + "/acceso-denegado");
+                }
+            }));
         return http.build();
     }
 
