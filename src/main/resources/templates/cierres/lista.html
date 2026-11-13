@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis cierres | Madre Masa</title>
+    <link rel="stylesheet" href="../../static/css/estilos.css" th:href="@{/css/estilos.css}">
+</head>
+<body>
+    <header th:replace="~{fragmentos/plantilla :: encabezado('cierres')}"></header>
+
+    <main class="contenedor contenedor-ancho">
+        <h1>Mis cierres de jornada</h1>
+        <div class="tabla-contenedor">
+            <table class="tabla">
+                <thead>
+                    <tr><th>Fecha</th><th>Punto de venta</th><th class="numero">Efectivo</th>
+                        <th class="numero">Datáfono</th><th class="numero">Total</th></tr>
+                </thead>
+                <tbody>
+                    <tr th:each="c : ${cierres}">
+                        <td th:text="${#temporals.format(c.fecha, 'dd/MM/yyyy')}">07/11/2026</td>
+                        <td th:text="${c.puntoVenta.nombre}">Feria A</td>
+                        <td class="numero">₡<span th:text="${#numbers.formatDecimal(c.montoEfectivo, 1, 'POINT', 0, 'COMMA')}">45.200</span></td>
+                        <td class="numero">₡<span th:text="${#numbers.formatDecimal(c.montoDatafono, 1, 'POINT', 0, 'COMMA')}">30.000</span></td>
+                        <td class="numero"><strong>₡<span th:text="${#numbers.formatDecimal(c.total, 1, 'POINT', 0, 'COMMA')}">75.200</span></strong></td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(cierres)}"><td colspan="5">Todavía no tiene cierres registrados.</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="nota">El registro de nuevos cierres se habilita en el Proyecto 3.</p>
+    </main>
+
+    <footer th:replace="~{fragmentos/plantilla :: pie}"></footer>
+</body>
+</html>
