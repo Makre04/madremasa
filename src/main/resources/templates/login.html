@@ -34,6 +34,15 @@
                 </div>
             </article>
 
+            <!-- Mensaje cuando el formulario estuvo abierto demasiado tiempo -->
+            <article class="mensaje mensaje-advertencia" role="status" th:if="${param.expirada}">
+                <span class="mensaje-icono" aria-hidden="true">⚠</span>
+                <div class="mensaje-contenido">
+                    <h2>La página había expirado</h2>
+                    <p>Por seguridad, el formulario se renovó. Ingrese de nuevo su código y su contraseña.</p>
+                </div>
+            </article>
+
             <form id="form-login" method="post" action="mensajes.html" th:action="@{/login}">
                 <div class="campo">
                     <label for="codigo">Código de empleado</label>

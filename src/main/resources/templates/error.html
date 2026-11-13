@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error | Madre Masa</title>
+    <link rel="stylesheet" href="../static/css/estilos.css" th:href="@{/css/estilos.css}">
+</head>
+<body>
+    <header class="encabezado">
+        <p class="logo">Madre Masa</p>
+    </header>
+
+    <!-- Página general de error: reemplaza la página por defecto de Spring Boot -->
+    <main class="contenedor">
+        <article class="mensaje mensaje-error" role="alert">
+            <span class="mensaje-icono" aria-hidden="true">✖</span>
+            <div class="mensaje-contenido">
+                <h2 th:text="${status == 404} ? 'Página no encontrada' : 'Ocurrió un problema'">Ocurrió un problema</h2>
+                <p th:if="${status == 404}">La dirección que intentó abrir no existe en el sistema.</p>
+                <p th:unless="${status == 404}">No se pudo completar la solicitud. Vuelva al panel e intente de nuevo.</p>
+            </div>
+        </article>
+        <a class="enlace-volver" th:href="@{/panel}" href="panel.html">← Volver al panel</a>
+    </main>
+</body>
+</html>
