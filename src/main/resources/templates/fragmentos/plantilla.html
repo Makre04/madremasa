@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Fragmentos comunes | Madre Masa</title>
+    <link rel="stylesheet" href="../../static/css/estilos.css">
+</head>
+<body>
+    <!-- Encabezado con el menú según el rol del usuario -->
+    <header class="encabezado encabezado-app" th:fragment="encabezado(activo)">
+        <a class="logo" th:href="@{/panel}" href="#">Madre Masa</a>
+        <nav class="menu" aria-label="Menú principal">
+            <a th:href="@{/panel}" href="#" th:classappend="${activo == 'panel'} ? 'activo'">Panel</a>
+            <a sec:authorize="hasAnyRole('ADMINISTRADOR','PRODUCCION')" th:href="@{/insumos}" href="#"
+               th:classappend="${activo == 'insumos'} ? 'activo'">Insumos</a>
+            <a sec:authorize="hasAnyRole('ADMINISTRADOR','PRODUCCION')" th:href="@{/recetas}" href="#"
+               th:classappend="${activo == 'recetas'} ? 'activo'">Recetas</a>
+            <a sec:authorize="hasAnyRole('ADMINISTRADOR','PRODUCCION')" th:href="@{/produccion}" href="#"
+               th:classappend="${activo == 'produccion'} ? 'activo'">Producción</a>
+            <a sec:authorize="hasRole('PUNTO_VENTA')" th:href="@{/cierres}" href="#"
+               th:classappend="${activo == 'cierres'} ? 'activo'">Mis cierres</a>
+            <a sec:authorize="hasRole('ADMINISTRADOR')" th:href="@{/ventas}" href="#"
+               th:classappend="${activo == 'ventas'} ? 'activo'">Ventas</a>
+            <a sec:authorize="hasRole('ADMINISTRADOR')" th:href="@{/usuarios}" href="#"
+               th:classappend="${activo == 'usuarios'} ? 'activo'">Usuarios</a>
+        </nav>
+        <form class="salida" th:action="@{/logout}" method="post">
+            <span class="usuario-actual" sec:authentication="name">EMP-001</span>
+            <button type="submit" class="boton-salir">Cerrar sesión</button>
+        </form>
+    </header>
+
+    <!-- Mensajes de éxito y error enviados por los controladores -->
+    <div th:fragment="mensajes">
+        <article class="mensaje mensaje-exito" role="status" th:if="${exito}">
+            <span class="mensaje-icono" aria-hidden="true">✔</span>
+            <div class="mensaje-contenido">
+                <h2>Operación completada</h2>
+                <p th:text="${exito}">Los datos se guardaron correctamente.</p>
+            </div>
+        </article>
+        <article class="mensaje mensaje-error" role="alert" th:if="${error}">
+            <span class="mensaje-icono" aria-hidden="true">✖</span>
+            <div class="mensaje-contenido">
+                <h2>No se pudo completar la operación</h2>
+                <p th:text="${error}">Revise los datos e inténtelo de nuevo.</p>
+            </div>
+        </article>
+    </div>
+
+    <footer class="pie" th:fragment="pie">
+        <p>&copy; <span th:text="${#temporals.year(#temporals.createNow())}">2026</span> Panadería Madre Masa</p>
+    </footer>
+</body>
+</html>
