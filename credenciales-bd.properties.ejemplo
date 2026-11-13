@@ -1,0 +1,6 @@
+# Copiar este archivo como credenciales-bd.properties (en la raíz del proyecto)
+# y completar los datos del usuario de SQL Server. Ese archivo no se sube al repositorio.
+DB_SERVIDOR=localhost
+DB_PUERTO=1433
+DB_USUARIO=usuario_de_la_aplicacion
+DB_CONTRASENA=contrasena_del_usuario

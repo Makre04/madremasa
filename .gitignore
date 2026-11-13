@@ -1,0 +1,14 @@
+# Compilación
+target/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# Credenciales locales de la base de datos (nunca se suben)
+credenciales-bd.properties
+database/*local*.sql
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
