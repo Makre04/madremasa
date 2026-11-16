@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,11 +10,16 @@
     <header th:replace="~{fragmentos/plantilla :: encabezado('usuarios')}"></header>
 
     <main class="contenedor contenedor-ancho">
-        <h1>Usuarios</h1>
+        <div class="titulo-con-accion">
+            <h1>Usuarios</h1>
+            <a class="boton" th:href="@{/usuarios/nuevo}" href="formulario.html">Nuevo empleado</a>
+        </div>
+        <div th:replace="~{fragmentos/plantilla :: mensajes}"></div>
+
         <div class="tabla-contenedor">
             <table class="tabla">
                 <thead>
-                    <tr><th>Código</th><th>Nombre</th><th>Rol</th><th>Estado</th></tr>
+                    <tr><th>Código</th><th>Nombre</th><th>Rol</th><th>Estado</th><th>Acción</th></tr>
                 </thead>
                 <tbody>
                     <tr th:each="u : ${usuarios}" th:classappend="${!u.activo} ? 'fila-inactiva'">
@@ -25,11 +30,20 @@
                             <span class="etiqueta etiqueta-ok" th:if="${u.activo}">Activo</span>
                             <span class="etiqueta" th:unless="${u.activo}">Inactivo</span>
                         </td>
+                        <td>
+                            <a th:href="@{/usuarios/{id}/editar(id=${u.idUsuario})}" href="formulario.html">Editar</a>
+                            <form class="form-eliminar" th:action="@{/usuarios/{id}/estado(id=${u.idUsuario})}" method="post"
+                                  th:unless="${u.idUsuario == session.usuarioId}">
+                                <input type="hidden" name="_csrf" th:value="${csrfToken}">
+                                <button type="submit" class="enlace-eliminar" th:text="${u.activo} ? 'Desactivar' : 'Activar'">Desactivar</button>
+                            </form>
+                        </td>
                     </tr>
                 </tbody>
             </table>
         </div>
-        <p class="nota">Las contraseñas se guardan cifradas con BCrypt y nunca se muestran.</p>
+        <p class="nota">Las contraseñas se guardan cifradas con BCrypt y nunca se muestran. Un código desactivado no se
+            reasigna a otra persona.</p>
     </main>
 
     <footer th:replace="~{fragmentos/plantilla :: pie}"></footer>

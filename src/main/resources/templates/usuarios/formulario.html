@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Empleado | Madre Masa</title>
+    <link rel="stylesheet" href="../../static/css/estilos.css" th:href="@{/css/estilos.css}">
+</head>
+<body>
+    <header th:replace="~{fragmentos/plantilla :: encabezado('usuarios')}"></header>
+
+    <main class="contenedor">
+        <h1 th:text="${usuario == null} ? 'Nuevo empleado' : 'Editar empleado'">Nuevo empleado</h1>
+        <div th:replace="~{fragmentos/plantilla :: mensajes}"></div>
+
+        <section class="tarjeta-formulario">
+            <form th:action="@{/usuarios/guardar}" method="post">
+                <input type="hidden" name="_csrf" th:value="${csrfToken}">
+                <input type="hidden" name="idUsuario" th:if="${usuario != null}" th:value="${usuario.idUsuario}">
+
+                <div class="campo">
+                    <label for="codigo">Código de empleado</label>
+                    <input type="text" id="codigo" name="codigo" maxlength="7" placeholder="EMP-005" required
+                           th:value="${usuario != null} ? ${usuario.codigoEmpleado} : ${codigo}"
+                           th:disabled="${usuario != null}">
+                    <p class="nota" th:if="${usuario != null}">El código no se puede cambiar.</p>
+                </div>
+
+                <div class="campo">
+                    <label for="nombre">Nombre completo</label>
+                    <input type="text" id="nombre" name="nombre" maxlength="100" required
+                           th:value="${nombre != null} ? ${nombre} : (${usuario != null} ? ${usuario.nombreCompleto} : '')">
+                </div>
+
+                <div class="campo">
+                    <label for="idRol">Rol</label>
+                    <select id="idRol" name="idRol" required>
+                        <option value="">Seleccione un rol</option>
+                        <option th:each="r : ${roles}" th:value="${r.idRol}" th:text="${r.nombreVisible}"
+                                th:selected="${(idRol != null and idRol == r.idRol) or (idRol == null and usuario != null and usuario.rol.idRol == r.idRol)}">Administrador</option>
+                    </select>
+                </div>
+
+                <div class="campo">
+                    <label for="contrasena" th:text="${usuario == null} ? 'Contraseña' : 'Nueva contraseña (opcional)'">Contraseña</label>
+                    <input type="password" id="contrasena" name="contrasena" minlength="8" autocomplete="new-password"
+                           th:required="${usuario == null}">
+                    <p class="nota" th:text="${usuario == null} ? 'Mínimo 8 caracteres.' : 'Déjela vacía para conservar la contraseña actual.'">Mínimo 8 caracteres.</p>
+                </div>
+
+                <div class="acciones">
+                    <a class="boton-secundario" th:href="@{/usuarios}" href="lista.html">Cancelar</a>
+                    <button type="submit">Guardar</button>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <footer th:replace="~{fragmentos/plantilla :: pie}"></footer>
+</body>
+</html>
