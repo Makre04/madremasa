@@ -1,6 +1,8 @@
 package com.madremasa.model;
 
 import jakarta.persistence.*;
+import java.util.List;
+import java.util.ArrayList;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -47,4 +49,15 @@ public class CierreVenta {
     public BigDecimal getTotal() { return total; }
     public Usuario getUsuario() { return usuario; }
     public LocalDateTime getFechaRegistro() { return fechaRegistro; }
+
+    // Productos vendidos en este cierre
+    @OneToMany(mappedBy = "cierre")
+    private List<DetalleCierre> detalles = new ArrayList<>();
+
+    public List<DetalleCierre> getDetalles() { return detalles; }
+    public void setPuntoVenta(PuntoVenta puntoVenta) { this.puntoVenta = puntoVenta; }
+    public void setFecha(LocalDate fecha) { this.fecha = fecha; }
+    public void setMontoEfectivo(BigDecimal montoEfectivo) { this.montoEfectivo = montoEfectivo; }
+    public void setMontoDatafono(BigDecimal montoDatafono) { this.montoDatafono = montoDatafono; }
+    public void setUsuario(Usuario usuario) { this.usuario = usuario; }
 }

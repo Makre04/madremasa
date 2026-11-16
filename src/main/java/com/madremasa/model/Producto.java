@@ -26,4 +26,8 @@ public class Producto {
     public String getNombre() { return nombre; }
     public BigDecimal getPrecioVenta() { return precioVenta; }
     public Boolean getActivo() { return activo; }
+
+    public void setNombre(String nombre) { this.nombre = nombre; }
+    public void setPrecioVenta(BigDecimal precioVenta) { this.precioVenta = precioVenta; }
+    public void setActivo(Boolean activo) { this.activo = activo; }
 }

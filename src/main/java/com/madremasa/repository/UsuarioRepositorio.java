@@ -11,4 +11,9 @@ public interface UsuarioRepositorio extends JpaRepository<Usuario, Integer> {
     Optional<Usuario> findByCodigoEmpleado(String codigoEmpleado);
 
     List<Usuario> findAllByOrderByCodigoEmpleadoAsc();
+
+    boolean existsByCodigoEmpleado(String codigoEmpleado);
+
+    // Empleados activos de un rol, por ejemplo para asignarlos a un punto de venta
+    List<Usuario> findByRolNombreAndActivoTrueOrderByCodigoEmpleadoAsc(String nombreRol);
 }

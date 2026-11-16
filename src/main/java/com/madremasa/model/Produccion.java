@@ -49,4 +49,12 @@ public class Produccion {
     public LocalDateTime getFecha() { return fecha; }
     public String getEstado() { return estado; }
     public String getMotivoAnulacion() { return motivoAnulacion; }
+
+    public void setReceta(Receta receta) { this.receta = receta; }
+    public void setTandas(Integer tandas) { this.tandas = tandas; }
+    public void setUnidadesProducidas(Integer unidadesProducidas) { this.unidadesProducidas = unidadesProducidas; }
+    public void setCostoTotal(BigDecimal costoTotal) { this.costoTotal = costoTotal; }
+    public void setUsuario(Usuario usuario) { this.usuario = usuario; }
+    public void setFecha(LocalDateTime fecha) { this.fecha = fecha; }
+    public void setEstado(String estado) { this.estado = estado; }
 }

@@ -48,4 +48,12 @@ public class Usuario {
     public Integer getIntentosFallidos() { return intentosFallidos; }
     public LocalDateTime getBloqueadoHasta() { return bloqueadoHasta; }
     public LocalDateTime getFechaCreacion() { return fechaCreacion; }
+
+    public void setCodigoEmpleado(String codigoEmpleado) { this.codigoEmpleado = codigoEmpleado; }
+    public void setNombreCompleto(String nombreCompleto) { this.nombreCompleto = nombreCompleto; }
+    public void setContrasenaHash(String contrasenaHash) { this.contrasenaHash = contrasenaHash; }
+    public void setRol(Rol rol) { this.rol = rol; }
+    public void setActivo(Boolean activo) { this.activo = activo; }
+    public void setIntentosFallidos(Integer intentosFallidos) { this.intentosFallidos = intentosFallidos; }
+    public void setBloqueadoHasta(LocalDateTime bloqueadoHasta) { this.bloqueadoHasta = bloqueadoHasta; }
 }

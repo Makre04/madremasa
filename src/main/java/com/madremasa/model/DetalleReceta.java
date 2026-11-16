@@ -33,4 +33,17 @@ public class DetalleReceta {
     public BigDecimal getCosto() {
         return cantidad.multiply(insumo.getCostoUnitario());
     }
+
+    public DetalleReceta() {
+    }
+
+    // Ingrediente nuevo: la llave compuesta se arma con la receta y el insumo
+    public DetalleReceta(Receta receta, Insumo insumo, BigDecimal cantidad) {
+        this.id = new DetalleRecetaId(receta.getIdReceta(), insumo.getIdInsumo());
+        this.receta = receta;
+        this.insumo = insumo;
+        this.cantidad = cantidad;
+    }
+
+    public void setCantidad(BigDecimal cantidad) { this.cantidad = cantidad; }
 }

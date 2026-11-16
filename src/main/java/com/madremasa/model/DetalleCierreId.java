@@ -29,4 +29,9 @@ public class DetalleCierreId implements Serializable {
     public int hashCode() {
         return Objects.hash(idCierre, idProducto);
     }
+
+    public DetalleCierreId(Integer idCierre, Integer idProducto) {
+        this.idCierre = idCierre;
+        this.idProducto = idProducto;
+    }
 }

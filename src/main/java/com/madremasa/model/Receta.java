@@ -38,4 +38,9 @@ public class Receta {
     public String getInstrucciones() { return instrucciones; }
     public Boolean getActivo() { return activo; }
     public List<DetalleReceta> getDetalles() { return detalles; }
+
+    public void setProducto(Producto producto) { this.producto = producto; }
+    public void setRendimiento(Integer rendimiento) { this.rendimiento = rendimiento; }
+    public void setInstrucciones(String instrucciones) { this.instrucciones = instrucciones; }
+    public void setActivo(Boolean activo) { this.activo = activo; }
 }

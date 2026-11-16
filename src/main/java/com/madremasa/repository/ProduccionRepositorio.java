@@ -8,4 +8,7 @@ import java.util.List;
 public interface ProduccionRepositorio extends JpaRepository<Produccion, Integer> {
 
     List<Produccion> findTop5ByOrderByFechaDesc();
+
+    // Historial completo de producción (RF-20)
+    List<Produccion> findAllByOrderByFechaDesc();
 }

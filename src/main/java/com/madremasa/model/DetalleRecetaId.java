@@ -32,4 +32,9 @@ public class DetalleRecetaId implements Serializable {
     public int hashCode() {
         return Objects.hash(idReceta, idInsumo);
     }
+
+    public DetalleRecetaId(Integer idReceta, Integer idInsumo) {
+        this.idReceta = idReceta;
+        this.idInsumo = idInsumo;
+    }
 }

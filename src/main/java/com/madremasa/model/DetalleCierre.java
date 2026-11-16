@@ -26,4 +26,14 @@ public class DetalleCierre {
     public CierreVenta getCierre() { return cierre; }
     public Producto getProducto() { return producto; }
     public Integer getUnidadesVendidas() { return unidadesVendidas; }
+
+    public DetalleCierre() {
+    }
+
+    public DetalleCierre(CierreVenta cierre, Producto producto, Integer unidadesVendidas) {
+        this.id = new DetalleCierreId(cierre.getIdCierre(), producto.getIdProducto());
+        this.cierre = cierre;
+        this.producto = producto;
+        this.unidadesVendidas = unidadesVendidas;
+    }
 }

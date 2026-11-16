@@ -49,4 +49,6 @@ public class Insumo {
     public void setCostoUnitario(BigDecimal costoUnitario) { this.costoUnitario = costoUnitario; }
     public Boolean getActivo() { return activo; }
     public void setActivo(Boolean activo) { this.activo = activo; }
+
+    public void setExistencia(BigDecimal existencia) { this.existencia = existencia; }
 }
