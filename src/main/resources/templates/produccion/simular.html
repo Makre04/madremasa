@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,11 +11,12 @@
 
     <main class="contenedor contenedor-ancho">
         <h1>Producción</h1>
-        <p>Calcule los insumos necesarios para producir una receta y verifique si alcanzan las existencias
-           antes de iniciar la producción. Esta simulación no modifica el inventario.</p>
+        <p>Calcule los insumos necesarios para producir una receta y verifique si alcanzan las existencias.
+           La simulación no modifica el inventario; al confirmar, los insumos se descuentan automáticamente.</p>
 
         <section class="tarjeta-formulario">
             <form th:action="@{/produccion/simular}" method="post" class="formulario-linea">
+                <input type="hidden" name="_csrf" th:value="${csrfToken}">
                 <div class="campo">
                     <label for="idReceta">Receta</label>
                     <select id="idReceta" name="idReceta" required>
@@ -42,6 +43,13 @@
                 <div class="mensaje-contenido">
                     <h2>Hay insumos suficientes</h2>
                     <p>Las existencias alcanzan para producir las tandas indicadas.</p>
+                    <!-- Confirmación: descuenta los insumos (RF-16, RF-18) -->
+                    <form th:action="@{/produccion/confirmar}" method="post" class="form-confirmar">
+                        <input type="hidden" name="_csrf" th:value="${csrfToken}">
+                        <input type="hidden" name="idReceta" th:value="${idReceta}">
+                        <input type="hidden" name="tandas" th:value="${tandas}">
+                        <button type="submit">Confirmar producción</button>
+                    </form>
                 </div>
             </article>
             <article class="mensaje mensaje-error" role="alert" th:unless="${alcanza}">
@@ -75,12 +83,12 @@
         </th:block>
 
         <section class="bloque">
-            <h2>Producciones recientes</h2>
+            <h2>Historial de producción</h2>
             <div class="tabla-contenedor">
                 <table class="tabla">
                     <thead>
-                        <tr><th>Fecha</th><th>Producto</th><th class="numero">Tandas</th><th class="numero">Unidades</th>
-                            <th class="numero" sec:authorize="hasRole('ADMINISTRADOR')">Costo</th><th>Estado</th></tr>
+                        <tr><th>Fecha</th><th>Producto</th><th class="numero">Tandas</th><th class="numero">Unidades</th><th>Responsable</th>
+                            <th th:if="${session.usuarioRol == 'ADMINISTRADOR'}" class="numero">Costo</th><th>Estado</th></tr>
                     </thead>
                     <tbody>
                         <tr th:each="p : ${producciones}">
@@ -88,7 +96,8 @@
                             <td th:text="${p.receta.producto.nombre}">Pan de masa madre clásico</td>
                             <td class="numero" th:text="${p.tandas}">1</td>
                             <td class="numero" th:text="${p.unidadesProducidas}">12</td>
-                            <td class="numero" sec:authorize="hasRole('ADMINISTRADOR')">₡<span th:text="${#numbers.formatDecimal(p.costoTotal, 1, 'POINT', 2, 'COMMA')}">6.380,40</span></td>
+                            <td th:text="${p.usuario.nombreCompleto}">Panadero de prueba</td>
+                            <td th:if="${session.usuarioRol == 'ADMINISTRADOR'}" class="numero">₡<span th:text="${#numbers.formatDecimal(p.costoTotal, 1, 'POINT', 2, 'COMMA')}">6.380,40</span></td>
                             <td th:text="${p.estado == 'CONFIRMADA'} ? 'Confirmada' : 'Anulada'">Confirmada</td>
                         </tr>
                     </tbody>
