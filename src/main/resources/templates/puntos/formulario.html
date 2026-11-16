@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Punto de venta | Madre Masa</title>
+    <link rel="stylesheet" href="../../static/css/estilos.css" th:href="@{/css/estilos.css}">
+</head>
+<body>
+    <header th:replace="~{fragmentos/plantilla :: encabezado('puntos')}"></header>
+
+    <main class="contenedor">
+        <h1 th:text="${punto == null} ? 'Nuevo punto de venta' : 'Editar punto de venta'">Nuevo punto de venta</h1>
+        <div th:replace="~{fragmentos/plantilla :: mensajes}"></div>
+
+        <section class="tarjeta-formulario">
+            <form th:action="@{/puntos/guardar}" method="post">
+                <input type="hidden" name="_csrf" th:value="${csrfToken}">
+                <input type="hidden" name="idPuntoVenta" th:if="${punto != null}" th:value="${punto.idPuntoVenta}">
+
+                <div class="campo">
+                    <label for="nombre">Nombre</label>
+                    <input type="text" id="nombre" name="nombre" maxlength="80" required
+                           th:value="${punto != null} ? ${punto.nombre} : ${param.nombre}">
+                </div>
+
+                <div class="campo">
+                    <label for="tipo">Tipo</label>
+                    <select id="tipo" name="tipo" required>
+                        <option value="">Seleccione</option>
+                        <option value="CENTRO" th:selected="${punto != null and punto.tipo == 'CENTRO'}">Centro de producción</option>
+                        <option value="FERIA" th:selected="${punto != null and punto.tipo == 'FERIA'}">Feria</option>
+                    </select>
+                </div>
+
+                <div class="campo">
+                    <label for="ubicacion">Ubicación</label>
+                    <input type="text" id="ubicacion" name="ubicacion" maxlength="150" required
+                           th:value="${punto != null} ? ${punto.ubicacion} : ${param.ubicacion}">
+                </div>
+
+                <fieldset class="campo dias-operacion">
+                    <legend>Días de operación</legend>
+                    <label th:each="d : ${ {1,2,3,4,5,6,7} }" class="dia">
+                        <input type="checkbox" name="dias" th:value="${d}"
+                               th:checked="${punto != null and #sets.contains(punto.dias, d)}">
+                        <span th:text="${ {'Lun','Mar','Mié','Jue','Vie','Sáb','Dom'}[d - 1] }">Lun</span>
+                    </label>
+                </fieldset>
+
+                <div class="campo campo-casilla">
+                    <input type="checkbox" id="activo" name="activo" value="true" th:checked="${punto == null or punto.activo}">
+                    <label for="activo">Punto de venta activo</label>
+                </div>
+
+                <div class="acciones">
+                    <a class="boton-secundario" th:href="@{/puntos}" href="lista.html">Cancelar</a>
+                    <button type="submit">Guardar</button>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <footer th:replace="~{fragmentos/plantilla :: pie}"></footer>
+</body>
+</html>

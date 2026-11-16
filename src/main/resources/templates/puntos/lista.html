@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Puntos de venta | Madre Masa</title>
+    <link rel="stylesheet" href="../../static/css/estilos.css" th:href="@{/css/estilos.css}">
+</head>
+<body>
+    <header th:replace="~{fragmentos/plantilla :: encabezado('puntos')}"></header>
+
+    <main class="contenedor contenedor-ancho">
+        <div class="titulo-con-accion">
+            <h1>Puntos de venta</h1>
+            <a class="boton" th:href="@{/puntos/nuevo}" href="formulario.html">Nuevo punto de venta</a>
+        </div>
+        <div th:replace="~{fragmentos/plantilla :: mensajes}"></div>
+
+        <div class="tabla-contenedor">
+            <table class="tabla">
+                <thead>
+                    <tr><th>Nombre</th><th>Tipo</th><th>Ubicación</th><th>Días de operación</th><th>Estado</th><th>Acción</th></tr>
+                </thead>
+                <tbody>
+                    <tr th:each="p : ${puntos}" th:classappend="${!p.activo} ? 'fila-inactiva'">
+                        <td th:text="${p.nombre}">Feria A</td>
+                        <td th:text="${p.tipo == 'CENTRO'} ? 'Centro de producción' : 'Feria'">Feria</td>
+                        <td th:text="${p.ubicacion}">Feria del agricultor, San José</td>
+                        <td th:text="${p.diasTexto}">Sáb</td>
+                        <td>
+                            <span class="etiqueta etiqueta-ok" th:if="${p.activo}">Activo</span>
+                            <span class="etiqueta" th:unless="${p.activo}">Inactivo</span>
+                        </td>
+                        <td><a th:href="@{/puntos/{id}/editar(id=${p.idPuntoVenta})}" href="formulario.html">Editar</a></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <section class="bloque">
+            <h2>Asignar empleado a un punto de venta</h2>
+            <section class="tarjeta-formulario">
+                <form th:action="@{/puntos/asignar}" method="post" class="formulario-linea">
+                    <input type="hidden" name="_csrf" th:value="${csrfToken}">
+                    <div class="campo">
+                        <label for="idUsuario">Empleado</label>
+                        <select id="idUsuario" name="idUsuario" required>
+                            <option value="">Seleccione</option>
+                            <option th:each="u : ${vendedores}" th:value="${u.idUsuario}"
+                                    th:text="${u.codigoEmpleado + ' - ' + u.nombreCompleto}">EMP-003 - Vendedora</option>
+                        </select>
+                    </div>
+                    <div class="campo">
+                        <label for="idPuntoVenta">Punto de venta</label>
+                        <select id="idPuntoVenta" name="idPuntoVenta" required>
+                            <option value="">Seleccione</option>
+                            <option th:each="p : ${puntosActivos}" th:value="${p.idPuntoVenta}" th:text="${p.nombre}">Feria A</option>
+                        </select>
+                    </div>
+                    <div class="campo">
+                        <label for="fecha">Fecha</label>
+                        <input type="date" id="fecha" name="fecha" required th:value="${hoy}">
+                    </div>
+                    <button type="submit">Asignar</button>
+                </form>
+            </section>
+
+            <div class="tabla-contenedor">
+                <table class="tabla">
+                    <thead><tr><th>Fecha</th><th>Empleado</th><th>Punto de venta</th></tr></thead>
+                    <tbody>
+                        <tr th:each="a : ${asignaciones}">
+                            <td th:text="${#temporals.format(a.fecha, 'dd/MM/yyyy')}">07/11/2026</td>
+                            <td th:text="${a.usuario.codigoEmpleado + ' - ' + a.usuario.nombreCompleto}">EMP-003 - Vendedora</td>
+                            <td th:text="${a.puntoVenta.nombre}">Feria A</td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(asignaciones)}"><td colspan="3">No hay asignaciones registradas.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <footer th:replace="~{fragmentos/plantilla :: pie}"></footer>
+</body>
+</html>
