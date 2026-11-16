@@ -25,6 +25,8 @@
                th:classappend="${activo == 'cierres'} ? 'activo'">Cierres</a>
             <a th:if="${session.usuarioRol == 'ADMINISTRADOR'}" th:href="@{/ventas}" href="#"
                th:classappend="${activo == 'ventas'} ? 'activo'">Ventas</a>
+            <a th:if="${session.usuarioRol == 'ADMINISTRADOR'}" th:href="@{/reportes/consumo}" href="#"
+               th:classappend="${activo == 'consumo'} ? 'activo'">Consumo</a>
             <a th:if="${session.usuarioRol == 'ADMINISTRADOR'}" th:href="@{/usuarios}" href="#"
                th:classappend="${activo == 'usuarios'} ? 'activo'">Usuarios</a>
         </nav>
@@ -52,6 +54,23 @@
             </div>
         </article>
     </div>
+
+    <!-- Filtro por período de los reportes (RF-24, RF-25) y enlace de exportación a CSV (RF-26) -->
+    <form class="tarjeta-formulario filtro-periodo" th:fragment="filtro(accion, csv)" th:action="@{${accion}}" method="get">
+        <div class="formulario-linea">
+            <div class="campo">
+                <label for="desde">Desde</label>
+                <input type="date" id="desde" name="desde" th:value="${periodo.desde}" required>
+            </div>
+            <div class="campo">
+                <label for="hasta">Hasta</label>
+                <input type="date" id="hasta" name="hasta" th:value="${periodo.hasta}" required>
+            </div>
+            <button type="submit">Consultar</button>
+            <a class="boton-secundario" th:href="@{${csv}(desde=${periodo.desde},hasta=${periodo.hasta})}" href="#">Exportar CSV</a>
+        </div>
+        <p class="texto-periodo">Período: <strong th:text="${periodo.texto()}">01/11/2026 al 16/11/2026</strong></p>
+    </form>
 
     <footer class="pie" th:fragment="pie">
         <p>&copy; <span th:text="${#temporals.year(#temporals.createNow())}">2026</span> Panadería Madre Masa</p>

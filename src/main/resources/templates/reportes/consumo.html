@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consumo y costo de producción | Madre Masa</title>
+    <link rel="stylesheet" href="../../static/css/estilos.css" th:href="@{/css/estilos.css}">
+</head>
+<body>
+    <header th:replace="~{fragmentos/plantilla :: encabezado('consumo')}"></header>
+
+    <main class="contenedor contenedor-ancho">
+        <h1>Consumo de insumos y costo de producción</h1>
+        <div th:replace="~{fragmentos/plantilla :: mensajes}"></div>
+        <form th:replace="~{fragmentos/plantilla :: filtro('/reportes/consumo', '/reportes/consumo/csv')}"></form>
+
+        <section class="indicadores">
+            <article class="indicador">
+                <h2>Costo de producción</h2>
+                <p class="indicador-valor">₡<span th:text="${#numbers.formatDecimal(costoTotal, 1, 'POINT', 0, 'COMMA')}">6.121</span></p>
+            </article>
+            <article class="indicador">
+                <h2>Insumos consumidos</h2>
+                <p class="indicador-valor" th:text="${#lists.size(consumo)}">4</p>
+            </article>
+        </section>
+
+        <section class="bloque">
+            <h2>Producción confirmada por producto</h2>
+            <div class="tabla-contenedor">
+                <table class="tabla">
+                    <thead>
+                        <tr><th>Producto</th><th class="numero">Producciones</th><th class="numero">Tandas</th>
+                            <th class="numero">Unidades</th><th class="numero">Costo</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="f : ${produccion}">
+                            <td th:text="${f.producto()}">Focaccia de romero</td>
+                            <td class="numero" th:text="${f.producciones()}">1</td>
+                            <td class="numero" th:text="${f.tandas()}">2</td>
+                            <td class="numero" th:text="${f.unidades()}">16</td>
+                            <td class="numero"><strong>₡<span th:text="${#numbers.formatDecimal(f.costo(), 1, 'POINT', 2, 'COMMA')}">6.120,60</span></strong></td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(produccion)}"><td colspan="5">No hay producción confirmada en el período.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="bloque">
+            <h2>Insumos consumidos por la producción</h2>
+            <p class="texto-ayuda">El costo se calcula con el costo unitario vigente de cada insumo.</p>
+            <div class="tabla-contenedor">
+                <table class="tabla">
+                    <thead>
+                        <tr><th>Insumo</th><th class="numero">Cantidad consumida</th><th class="numero">Costo</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="c : ${consumo}">
+                            <td th:text="${c.insumo()}">Harina de trigo</td>
+                            <td class="numero" th:text="${#numbers.formatDecimal(c.cantidad(), 1, 'POINT', 0, 'COMMA') + ' ' + c.unidad()}">6.000 g</td>
+                            <td class="numero">₡<span th:text="${#numbers.formatDecimal(c.costo(), 1, 'POINT', 2, 'COMMA')}">5.439,00</span></td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(consumo)}"><td colspan="3">No hubo consumo de insumos en el período.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <footer th:replace="~{fragmentos/plantilla :: pie}"></footer>
+</body>
+</html>
