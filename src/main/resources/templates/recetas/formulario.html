@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nueva receta | Madre Masa</title>
+    <link rel="stylesheet" href="../../static/css/estilos.css" th:href="@{/css/estilos.css}">
+</head>
+<body>
+    <header th:replace="~{fragmentos/plantilla :: encabezado('recetas')}"></header>
+
+    <main class="contenedor">
+        <h1>Nueva receta</h1>
+        <p>Se registra el producto con su receta y el primer ingrediente. Los demás ingredientes se agregan en el detalle.</p>
+        <div th:replace="~{fragmentos/plantilla :: mensajes}"></div>
+
+        <section class="tarjeta-formulario">
+            <form th:action="@{/recetas/guardar}" method="post">
+                <input type="hidden" name="_csrf" th:value="${csrfToken}">
+                <div class="campo">
+                    <label for="nombreProducto">Producto</label>
+                    <input type="text" id="nombreProducto" name="nombreProducto" maxlength="80" required th:value="${nombreProducto}">
+                </div>
+                <div class="campo-doble">
+                    <div class="campo">
+                        <label for="precio">Precio de venta (₡)</label>
+                        <input type="number" id="precio" name="precio" min="0" step="0.01" required th:value="${precio}">
+                    </div>
+                    <div class="campo">
+                        <label for="rendimiento">Rendimiento (unidades por tanda)</label>
+                        <input type="number" id="rendimiento" name="rendimiento" min="1" step="1" required th:value="${rendimiento}">
+                    </div>
+                </div>
+                <div class="campo">
+                    <label for="instrucciones">Instrucciones (opcional)</label>
+                    <input type="text" id="instrucciones" name="instrucciones" maxlength="1000" th:value="${instrucciones}">
+                </div>
+                <div class="campo-doble">
+                    <div class="campo">
+                        <label for="idInsumo">Primer ingrediente</label>
+                        <select id="idInsumo" name="idInsumo" required>
+                            <option value="">Seleccione un insumo</option>
+                            <option th:each="i : ${insumos}" th:value="${i.idInsumo}"
+                                    th:text="${i.nombre + ' (' + i.unidad.simbolo + ')'}">Harina de trigo (g)</option>
+                        </select>
+                    </div>
+                    <div class="campo">
+                        <label for="cantidad">Cantidad por tanda</label>
+                        <input type="number" id="cantidad" name="cantidad" min="0.001" step="0.001" required>
+                    </div>
+                </div>
+                <div class="acciones">
+                    <a class="boton-secundario" th:href="@{/recetas}" href="lista.html">Cancelar</a>
+                    <button type="submit">Guardar receta</button>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <footer th:replace="~{fragmentos/plantilla :: pie}"></footer>
+</body>
+</html>

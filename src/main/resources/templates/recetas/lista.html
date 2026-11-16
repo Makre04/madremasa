@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,7 +10,10 @@
     <header th:replace="~{fragmentos/plantilla :: encabezado('recetas')}"></header>
 
     <main class="contenedor contenedor-ancho">
-        <h1>Recetas</h1>
+        <div class="titulo-con-accion">
+            <h1>Recetas</h1>
+            <a class="boton" th:if="${session.usuarioRol == 'ADMINISTRADOR'}" th:href="@{/recetas/nueva}" href="formulario.html">Nueva receta</a>
+        </div>
         <div th:replace="~{fragmentos/plantilla :: mensajes}"></div>
 
         <div class="tabla-contenedor">
@@ -18,9 +21,9 @@
                 <thead>
                     <tr>
                         <th>Producto</th><th class="numero">Rendimiento</th><th class="numero">Ingredientes</th>
-                        <th class="numero" sec:authorize="hasRole('ADMINISTRADOR')">Costo por unidad</th>
-                        <th class="numero" sec:authorize="hasRole('ADMINISTRADOR')">Precio</th>
-                        <th class="numero" sec:authorize="hasRole('ADMINISTRADOR')">Margen</th>
+                        <th th:if="${session.usuarioRol == 'ADMINISTRADOR'}" class="numero">Costo por unidad</th>
+                        <th th:if="${session.usuarioRol == 'ADMINISTRADOR'}" class="numero">Precio</th>
+                        <th th:if="${session.usuarioRol == 'ADMINISTRADOR'}" class="numero">Margen</th>
                         <th>Detalle</th>
                     </tr>
                 </thead>
@@ -29,9 +32,9 @@
                         <td th:text="${r.producto.nombre}">Pan de masa madre clásico</td>
                         <td class="numero"><span th:text="${r.rendimiento}">12</span> u/tanda</td>
                         <td class="numero" th:text="${#lists.size(r.detalles)}">4</td>
-                        <td class="numero" sec:authorize="hasRole('ADMINISTRADOR')">₡<span th:text="${#numbers.formatDecimal(costos.costoPorUnidad(r), 1, 'POINT', 2, 'COMMA')}">531,70</span></td>
-                        <td class="numero" sec:authorize="hasRole('ADMINISTRADOR')">₡<span th:text="${#numbers.formatDecimal(r.producto.precioVenta, 1, 'POINT', 0, 'COMMA')}">2.500</span></td>
-                        <td class="numero" sec:authorize="hasRole('ADMINISTRADOR')"><span th:text="${#numbers.formatDecimal(costos.margen(r), 1, 'POINT', 1, 'COMMA')}">78,7</span> %</td>
+                        <td th:if="${session.usuarioRol == 'ADMINISTRADOR'}" class="numero">₡<span th:text="${#numbers.formatDecimal(costos.costoPorUnidad(r), 1, 'POINT', 2, 'COMMA')}">531,70</span></td>
+                        <td th:if="${session.usuarioRol == 'ADMINISTRADOR'}" class="numero">₡<span th:text="${#numbers.formatDecimal(r.producto.precioVenta, 1, 'POINT', 0, 'COMMA')}">2.500</span></td>
+                        <td th:if="${session.usuarioRol == 'ADMINISTRADOR'}" class="numero"><span th:text="${#numbers.formatDecimal(costos.margen(r), 1, 'POINT', 1, 'COMMA')}">78,7</span> %</td>
                         <td><a th:href="@{/recetas/{id}(id=${r.idReceta})}" href="detalle.html">Ver</a></td>
                     </tr>
                 </tbody>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,32 +9,92 @@
 <body>
     <header th:replace="~{fragmentos/plantilla :: encabezado('recetas')}"></header>
 
-    <main class="contenedor">
+    <main class="contenedor contenedor-ancho">
         <h1 th:text="${receta.producto.nombre}">Pan de masa madre clásico</h1>
         <p>Rendimiento: <strong th:text="${receta.rendimiento}">12</strong> unidades por tanda.</p>
         <p class="nota" th:if="${receta.instrucciones}" th:text="${receta.instrucciones}">Instrucciones de la receta.</p>
+        <div th:replace="~{fragmentos/plantilla :: mensajes}"></div>
 
         <div class="tabla-contenedor">
             <table class="tabla">
                 <thead>
                     <tr><th>Insumo</th><th class="numero">Cantidad por tanda</th>
-                        <th class="numero" sec:authorize="hasRole('ADMINISTRADOR')">Costo</th></tr>
+                        <th th:if="${session.usuarioRol == 'ADMINISTRADOR'}" class="numero">Costo</th>
+                        <th th:if="${session.usuarioRol == 'ADMINISTRADOR'}">Acción</th></tr>
                 </thead>
                 <tbody>
                     <tr th:each="d : ${receta.detalles}">
                         <td th:text="${d.insumo.nombre}">Harina de trigo</td>
                         <td class="numero"><span th:text="${#numbers.formatInteger(d.cantidad, 1, 'POINT')}">6.000</span> <span th:text="${d.insumo.unidad.simbolo}">g</span></td>
-                        <td class="numero" sec:authorize="hasRole('ADMINISTRADOR')">₡<span th:text="${#numbers.formatDecimal(d.costo, 1, 'POINT', 2, 'COMMA')}">5.700,00</span></td>
+                        <td th:if="${session.usuarioRol == 'ADMINISTRADOR'}" class="numero">₡<span th:text="${#numbers.formatDecimal(d.costo, 1, 'POINT', 2, 'COMMA')}">5.700,00</span></td>
+                        <td th:if="${session.usuarioRol == 'ADMINISTRADOR'}">
+                            <form class="form-eliminar" th:action="@{/recetas/{id}/ingredientes/{insumo}/quitar(id=${receta.idReceta},insumo=${d.insumo.idInsumo})}" method="post">
+                                <input type="hidden" name="_csrf" th:value="${csrfToken}">
+                                <button type="submit" class="enlace-eliminar">Quitar</button>
+                            </form>
+                        </td>
                     </tr>
                 </tbody>
-                <tfoot sec:authorize="hasRole('ADMINISTRADOR')">
+                <tfoot th:if="${session.usuarioRol == 'ADMINISTRADOR'}">
                     <tr><th>Costo por tanda</th><th></th>
-                        <th class="numero">₡<span th:text="${#numbers.formatDecimal(costos.costoPorTanda(receta), 1, 'POINT', 2, 'COMMA')}">6.380,40</span></th></tr>
+                        <th class="numero">₡<span th:text="${#numbers.formatDecimal(costos.costoPorTanda(receta), 1, 'POINT', 2, 'COMMA')}">6.380,40</span></th><th></th></tr>
                     <tr><th>Costo por unidad</th><th></th>
-                        <th class="numero">₡<span th:text="${#numbers.formatDecimal(costos.costoPorUnidad(receta), 1, 'POINT', 2, 'COMMA')}">531,70</span></th></tr>
+                        <th class="numero">₡<span th:text="${#numbers.formatDecimal(costos.costoPorUnidad(receta), 1, 'POINT', 2, 'COMMA')}">531,70</span></th><th></th></tr>
+                    <tr><th>Precio de venta y margen</th><th></th>
+                        <th class="numero">₡<span th:text="${#numbers.formatDecimal(receta.producto.precioVenta, 1, 'POINT', 0, 'COMMA')}">2.500</span>
+                            (<span th:text="${#numbers.formatDecimal(costos.margen(receta), 1, 'POINT', 1, 'COMMA')}">78,7</span> %)</th><th></th></tr>
                 </tfoot>
             </table>
         </div>
+        <div class="formularios-dobles" th:if="${session.usuarioRol == 'ADMINISTRADOR'}">
+            <!-- Agregar un ingrediente o cambiar su cantidad (RF-13) -->
+            <section class="tarjeta-formulario">
+                <h2>Agregar o cambiar ingrediente</h2>
+                <form th:action="@{/recetas/{id}/ingredientes(id=${receta.idReceta})}" method="post">
+                    <input type="hidden" name="_csrf" th:value="${csrfToken}">
+                    <div class="campo">
+                        <label for="idInsumo">Insumo</label>
+                        <select id="idInsumo" name="idInsumo" required>
+                            <option value="">Seleccione un insumo</option>
+                            <option th:each="i : ${insumos}" th:value="${i.idInsumo}"
+                                    th:text="${i.nombre + ' (' + i.unidad.simbolo + ')'}">Harina de trigo (g)</option>
+                        </select>
+                    </div>
+                    <div class="campo">
+                        <label for="cantidad">Cantidad por tanda</label>
+                        <input type="number" id="cantidad" name="cantidad" min="0.001" step="0.001" required>
+                    </div>
+                    <div class="acciones"><button type="submit">Guardar ingrediente</button></div>
+                </form>
+            </section>
+
+            <!-- Precio, rendimiento e instrucciones (RF-15) -->
+            <section class="tarjeta-formulario">
+                <h2>Datos de la receta</h2>
+                <form th:action="@{/recetas/{id}/actualizar(id=${receta.idReceta})}" method="post">
+                    <input type="hidden" name="_csrf" th:value="${csrfToken}">
+                    <div class="campo-doble">
+                        <div class="campo">
+                            <label for="precio">Precio de venta (₡)</label>
+                            <input type="number" id="precio" name="precio" min="0" step="0.01" required
+                                   th:value="${receta.producto.precioVenta}">
+                        </div>
+                        <div class="campo">
+                            <label for="rendimiento">Unidades por tanda</label>
+                            <input type="number" id="rendimiento" name="rendimiento" min="1" step="1" required
+                                   th:value="${receta.rendimiento}">
+                        </div>
+                    </div>
+                    <div class="campo">
+                        <label for="instrucciones">Instrucciones</label>
+                        <input type="text" id="instrucciones" name="instrucciones" maxlength="1000"
+                               th:value="${receta.instrucciones}">
+                    </div>
+                    <div class="acciones"><button type="submit">Actualizar</button></div>
+                </form>
+            </section>
+        </div>
+
         <a class="enlace-volver" th:href="@{/recetas}" href="lista.html">← Volver a recetas</a>
     </main>
 
