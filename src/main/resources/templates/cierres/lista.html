@@ -75,7 +75,8 @@
                         <tr><th>Fecha</th><th>Punto de venta</th>
                             <th th:if="${session.usuarioRol == 'ADMINISTRADOR'}">Registrado por</th>
                             <th>Productos vendidos</th>
-                            <th class="numero">Efectivo</th><th class="numero">Datáfono</th><th class="numero">Total</th></tr>
+                            <th class="numero">Efectivo</th><th class="numero">Datáfono</th><th class="numero">Total</th>
+                            <th th:if="${session.usuarioRol == 'ADMINISTRADOR'}">Acciones</th></tr>
                     </thead>
                     <tbody>
                         <tr th:each="c : ${cierres}">
@@ -89,8 +90,11 @@
                             <td class="numero">₡<span th:text="${#numbers.formatDecimal(c.montoEfectivo, 1, 'POINT', 0, 'COMMA')}">45.200</span></td>
                             <td class="numero">₡<span th:text="${#numbers.formatDecimal(c.montoDatafono, 1, 'POINT', 0, 'COMMA')}">30.000</span></td>
                             <td class="numero"><strong>₡<span th:text="${#numbers.formatDecimal(c.total, 1, 'POINT', 0, 'COMMA')}">75.200</span></strong></td>
+                            <td th:if="${session.usuarioRol == 'ADMINISTRADOR'}">
+                                <a class="enlace-tabla" th:href="@{/cierres/{id}/editar(id=${c.idCierre})}" href="#">Corregir</a>
+                            </td>
                         </tr>
-                        <tr th:if="${#lists.isEmpty(cierres)}"><td colspan="7">Todavía no hay cierres registrados.</td></tr>
+                        <tr th:if="${#lists.isEmpty(cierres)}"><td colspan="8">Todavía no hay cierres registrados.</td></tr>
                     </tbody>
                 </table>
             </div>

@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -19,7 +20,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 // Cierres de jornada (RF-21, RF-22). El empleado de punto de venta registra el cierre de su punto asignado;
-// el administrador consulta todos los cierres.
+// el administrador consulta todos los cierres y puede corregirlos.
 @Controller
 public class CierreController {
 
@@ -74,5 +75,46 @@ public class CierreController {
             redireccion.addFlashAttribute("error", e.getMessage());
         }
         return "redirect:/cierres";
+    }
+
+    // RF-22: formulario de corrección de un cierre (solo administrador)
+    @GetMapping("/cierres/{id}/editar")
+    public String editar(@PathVariable Integer id, HttpSession sesion, Model modelo, RedirectAttributes redireccion) {
+        String acceso = controlAcceso.verificar(sesion, ControlAcceso.ADMINISTRADOR);
+        if (acceso != null) return acceso;
+
+        CierreVenta cierre = cierreRepositorio.findById(id).orElse(null);
+        if (cierre == null) {
+            redireccion.addFlashAttribute("error", "El cierre no existe.");
+            return "redirect:/cierres";
+        }
+        // Unidades actuales por producto; los productos que no estaban en el cierre aparecen en cero
+        java.util.Map<Integer, Integer> unidades = new java.util.HashMap<>();
+        cierre.getDetalles().forEach(d -> unidades.put(d.getProducto().getIdProducto(), d.getUnidadesVendidas()));
+        modelo.addAttribute("cierre", cierre);
+        modelo.addAttribute("productos", productoRepositorio.findByActivoTrueOrderByNombreAsc());
+        modelo.addAttribute("unidades", unidades);
+        return "cierres/formulario";
+    }
+
+    @PostMapping("/cierres/{id}/corregir")
+    public String corregir(@PathVariable Integer id,
+                           @RequestParam(required = false) BigDecimal efectivo,
+                           @RequestParam(required = false) BigDecimal datafono,
+                           @RequestParam(required = false) List<Integer> idProducto,
+                           @RequestParam(required = false) List<Integer> unidades,
+                           HttpSession sesion, RedirectAttributes redireccion) {
+        String acceso = controlAcceso.verificar(sesion, ControlAcceso.ADMINISTRADOR);
+        if (acceso != null) return acceso;
+
+        try {
+            CierreVenta cierre = cierreService.corregir(id, efectivo, datafono, idProducto, unidades);
+            redireccion.addFlashAttribute("exito", "El cierre de " + cierre.getPuntoVenta().getNombre()
+                    + " se corrigió correctamente.");
+            return "redirect:/cierres";
+        } catch (ReglaNegocioException e) {
+            redireccion.addFlashAttribute("error", e.getMessage());
+            return "redirect:/cierres/" + id + "/editar";
+        }
     }
 }

@@ -26,6 +26,7 @@ public class DetalleCierre {
     public CierreVenta getCierre() { return cierre; }
     public Producto getProducto() { return producto; }
     public Integer getUnidadesVendidas() { return unidadesVendidas; }
+    public void setUnidadesVendidas(Integer unidadesVendidas) { this.unidadesVendidas = unidadesVendidas; }
 
     public DetalleCierre() {
     }
