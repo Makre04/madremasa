@@ -22,8 +22,9 @@ madre que produce en un centro de producción y vende en ferias del agricultor.
 | Insumos e inventario | CRUD de insumos, entradas con costo promedio ponderado, ajustes con motivo e historial | Administrador; Producción consulta y registra entradas |
 | Recetas y costeo | Registrar recetas, ingredientes, precio, costo por unidad y margen | Administrador; Producción consulta sin costos |
 | Producción | Simular, ver faltantes, confirmar con descuento automático de insumos e historial | Administrador y Producción |
-| Cierres | Registrar el cierre de jornada del punto asignado; consulta de cierres | Punto de venta registra; Administrador consulta |
-| Ventas | Reporte por punto de venta y por producto | Administrador |
+| Cierres | Registrar el cierre de jornada del punto asignado; consulta y corrección de cierres | Punto de venta registra; Administrador consulta y corrige |
+| Ventas | Reporte por punto de venta y por producto en un período, exportable a CSV | Administrador |
+| Consumo | Consumo de insumos y costo de producción en un período, exportable a CSV | Administrador |
 
 ## Seguridad
 
@@ -45,9 +46,10 @@ madremasa/
 │   ├── repository/    repositorios de Spring Data JPA
 │   ├── service/       reglas de negocio
 │   └── sesion/        control de acceso con HttpSession
-└── src/main/resources/
-    ├── templates/     vistas Thymeleaf
-    └── static/css/    hoja de estilos
+├── src/main/resources/
+│   ├── templates/     vistas Thymeleaf
+│   └── static/css/    hoja de estilos
+└── src/test/java/com/madremasa/service/   pruebas unitarias de los servicios
 ```
 
 ## Cómo ejecutar
@@ -60,6 +62,16 @@ madremasa/
    También se pueden usar las variables de entorno `DB_USUARIO` y `DB_CONTRASENA`.
 4. Ejecutar la clase `MadreMasaApplication` desde IntelliJ IDEA (JDK 17) o con `./mvnw spring-boot:run`.
 5. Abrir `http://localhost:8080`.
+
+## Pruebas
+
+Las pruebas unitarias usan JUnit 5 y Mockito (`spring-boot-starter-test`) y no necesitan la base de datos: los
+repositorios se reemplazan por objetos simulados. Cubren el inventario (promedio ponderado, ajustes negativos), la
+producción (descuento de insumos y la regla de todo o nada), los empleados (formato del código y bloqueo por
+intentos), los cierres (corrección) y los reportes (período y formato CSV).
+
+Para ejecutarlas: en IntelliJ IDEA, abrir `src/test/java/com/madremasa/service` y ejecutar las pruebas del paquete,
+o usar `./mvnw test`.
 
 ## Usuarios de prueba
 
