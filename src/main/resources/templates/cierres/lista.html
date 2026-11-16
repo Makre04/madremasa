@@ -1,35 +1,100 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mis cierres | Madre Masa</title>
+    <title>Cierres | Madre Masa</title>
     <link rel="stylesheet" href="../../static/css/estilos.css" th:href="@{/css/estilos.css}">
 </head>
 <body>
     <header th:replace="~{fragmentos/plantilla :: encabezado('cierres')}"></header>
 
     <main class="contenedor contenedor-ancho">
-        <h1>Mis cierres de jornada</h1>
-        <div class="tabla-contenedor">
-            <table class="tabla">
-                <thead>
-                    <tr><th>Fecha</th><th>Punto de venta</th><th class="numero">Efectivo</th>
-                        <th class="numero">Datáfono</th><th class="numero">Total</th></tr>
-                </thead>
-                <tbody>
-                    <tr th:each="c : ${cierres}">
-                        <td th:text="${#temporals.format(c.fecha, 'dd/MM/yyyy')}">07/11/2026</td>
-                        <td th:text="${c.puntoVenta.nombre}">Feria A</td>
-                        <td class="numero">₡<span th:text="${#numbers.formatDecimal(c.montoEfectivo, 1, 'POINT', 0, 'COMMA')}">45.200</span></td>
-                        <td class="numero">₡<span th:text="${#numbers.formatDecimal(c.montoDatafono, 1, 'POINT', 0, 'COMMA')}">30.000</span></td>
-                        <td class="numero"><strong>₡<span th:text="${#numbers.formatDecimal(c.total, 1, 'POINT', 0, 'COMMA')}">75.200</span></strong></td>
-                    </tr>
-                    <tr th:if="${#lists.isEmpty(cierres)}"><td colspan="5">Todavía no tiene cierres registrados.</td></tr>
-                </tbody>
-            </table>
-        </div>
-        <p class="nota">El registro de nuevos cierres se habilita en el Proyecto 3.</p>
+        <h1 th:text="${session.usuarioRol == 'ADMINISTRADOR'} ? 'Cierres de jornada' : 'Mis cierres de jornada'">Mis cierres de jornada</h1>
+        <div th:replace="~{fragmentos/plantilla :: mensajes}"></div>
+
+        <!-- Registro del cierre del punto asignado hoy (RF-21) -->
+        <th:block th:if="${session.usuarioRol == 'PUNTO_VENTA'}">
+            <article class="mensaje mensaje-advertencia" role="status" th:if="${asignacion == null}">
+                <span class="mensaje-icono" aria-hidden="true">⚠</span>
+                <div class="mensaje-contenido">
+                    <h2>Sin asignación para hoy</h2>
+                    <p>No tiene un punto de venta asignado para hoy. Consulte con la administradora.</p>
+                </div>
+            </article>
+            <article class="mensaje mensaje-exito" role="status" th:if="${asignacion != null and productos == null}">
+                <span class="mensaje-icono" aria-hidden="true">✔</span>
+                <div class="mensaje-contenido">
+                    <h2>Cierre registrado</h2>
+                    <p>El cierre de <strong th:text="${asignacion.puntoVenta.nombre}">Feria A</strong> para hoy ya fue registrado.</p>
+                </div>
+            </article>
+
+            <section class="tarjeta-formulario" th:if="${productos != null}">
+                <h2>Cierre de hoy: <span th:text="${asignacion.puntoVenta.nombre}">Feria A</span>
+                    (<span th:text="${#temporals.format(asignacion.fecha, 'dd/MM/yyyy')}">16/11/2026</span>)</h2>
+                <form th:action="@{/cierres/registrar}" method="post">
+                    <input type="hidden" name="_csrf" th:value="${csrfToken}">
+                    <div class="tabla-contenedor">
+                        <table class="tabla">
+                            <thead><tr><th>Producto</th><th class="numero">Unidades vendidas</th></tr></thead>
+                            <tbody>
+                                <tr th:each="p, estado : ${productos}">
+                                    <td>
+                                        <label th:for="${'unidades' + estado.index}" th:text="${p.nombre}">Pan de masa madre clásico</label>
+                                        <input type="hidden" name="idProducto" th:value="${p.idProducto}">
+                                    </td>
+                                    <td class="numero">
+                                        <input type="number" th:id="${'unidades' + estado.index}" name="unidades"
+                                               min="0" step="1" value="0" required class="entrada-corta">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="campo-doble">
+                        <div class="campo">
+                            <label for="efectivo">Cobrado en efectivo (₡)</label>
+                            <input type="number" id="efectivo" name="efectivo" min="0" step="0.01" required>
+                        </div>
+                        <div class="campo">
+                            <label for="datafono">Cobrado por datáfono (₡)</label>
+                            <input type="number" id="datafono" name="datafono" min="0" step="0.01" required>
+                        </div>
+                    </div>
+                    <div class="acciones"><button type="submit">Registrar cierre</button></div>
+                </form>
+            </section>
+        </th:block>
+
+        <section class="bloque">
+            <h2>Cierres registrados</h2>
+            <div class="tabla-contenedor">
+                <table class="tabla">
+                    <thead>
+                        <tr><th>Fecha</th><th>Punto de venta</th>
+                            <th th:if="${session.usuarioRol == 'ADMINISTRADOR'}">Registrado por</th>
+                            <th>Productos vendidos</th>
+                            <th class="numero">Efectivo</th><th class="numero">Datáfono</th><th class="numero">Total</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="c : ${cierres}">
+                            <td th:text="${#temporals.format(c.fecha, 'dd/MM/yyyy')}">07/11/2026</td>
+                            <td th:text="${c.puntoVenta.nombre}">Feria A</td>
+                            <td th:if="${session.usuarioRol == 'ADMINISTRADOR'}" th:text="${c.usuario.codigoEmpleado}">EMP-003</td>
+                            <td>
+                                <span th:each="d, e : ${c.detalles}" th:if="${d.unidadesVendidas > 0}"
+                                      th:text="${d.producto.nombre + ': ' + d.unidadesVendidas + ' u'}" class="detalle-cierre">Pan: 20 u</span>
+                            </td>
+                            <td class="numero">₡<span th:text="${#numbers.formatDecimal(c.montoEfectivo, 1, 'POINT', 0, 'COMMA')}">45.200</span></td>
+                            <td class="numero">₡<span th:text="${#numbers.formatDecimal(c.montoDatafono, 1, 'POINT', 0, 'COMMA')}">30.000</span></td>
+                            <td class="numero"><strong>₡<span th:text="${#numbers.formatDecimal(c.total, 1, 'POINT', 0, 'COMMA')}">75.200</span></strong></td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(cierres)}"><td colspan="7">Todavía no hay cierres registrados.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
     </main>
 
     <footer th:replace="~{fragmentos/plantilla :: pie}"></footer>
