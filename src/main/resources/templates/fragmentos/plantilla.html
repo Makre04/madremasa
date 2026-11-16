@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Fragmentos comunes | Madre Masa</title>
@@ -11,21 +11,26 @@
         <a class="logo" th:href="@{/panel}" href="#">Madre Masa</a>
         <nav class="menu" aria-label="Menú principal">
             <a th:href="@{/panel}" href="#" th:classappend="${activo == 'panel'} ? 'activo'">Panel</a>
-            <a sec:authorize="hasAnyRole('ADMINISTRADOR','PRODUCCION')" th:href="@{/insumos}" href="#"
+            <a th:if="${session.usuarioRol == 'ADMINISTRADOR' or session.usuarioRol == 'PRODUCCION'}" th:href="@{/insumos}" href="#"
                th:classappend="${activo == 'insumos'} ? 'activo'">Insumos</a>
-            <a sec:authorize="hasAnyRole('ADMINISTRADOR','PRODUCCION')" th:href="@{/recetas}" href="#"
+            <a th:if="${session.usuarioRol == 'ADMINISTRADOR' or session.usuarioRol == 'PRODUCCION'}" th:href="@{/recetas}" href="#"
                th:classappend="${activo == 'recetas'} ? 'activo'">Recetas</a>
-            <a sec:authorize="hasAnyRole('ADMINISTRADOR','PRODUCCION')" th:href="@{/produccion}" href="#"
+            <a th:if="${session.usuarioRol == 'ADMINISTRADOR' or session.usuarioRol == 'PRODUCCION'}" th:href="@{/produccion}" href="#"
                th:classappend="${activo == 'produccion'} ? 'activo'">Producción</a>
-            <a sec:authorize="hasRole('PUNTO_VENTA')" th:href="@{/cierres}" href="#"
+            <a th:if="${session.usuarioRol == 'PUNTO_VENTA'}" th:href="@{/cierres}" href="#"
                th:classappend="${activo == 'cierres'} ? 'activo'">Mis cierres</a>
-            <a sec:authorize="hasRole('ADMINISTRADOR')" th:href="@{/ventas}" href="#"
+            <a th:if="${session.usuarioRol == 'ADMINISTRADOR'}" th:href="@{/puntos}" href="#"
+               th:classappend="${activo == 'puntos'} ? 'activo'">Puntos de venta</a>
+            <a th:if="${session.usuarioRol == 'ADMINISTRADOR'}" th:href="@{/cierres}" href="#"
+               th:classappend="${activo == 'cierres'} ? 'activo'">Cierres</a>
+            <a th:if="${session.usuarioRol == 'ADMINISTRADOR'}" th:href="@{/ventas}" href="#"
                th:classappend="${activo == 'ventas'} ? 'activo'">Ventas</a>
-            <a sec:authorize="hasRole('ADMINISTRADOR')" th:href="@{/usuarios}" href="#"
+            <a th:if="${session.usuarioRol == 'ADMINISTRADOR'}" th:href="@{/usuarios}" href="#"
                th:classappend="${activo == 'usuarios'} ? 'activo'">Usuarios</a>
         </nav>
         <form class="salida" th:action="@{/logout}" method="post">
-            <span class="usuario-actual" sec:authentication="name">EMP-001</span>
+            <input type="hidden" name="_csrf" th:value="${csrfToken}">
+            <span class="usuario-actual" th:text="${session.usuarioCodigo}">EMP-001</span>
             <button type="submit" class="boton-salir">Cerrar sesión</button>
         </form>
     </header>

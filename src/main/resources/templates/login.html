@@ -25,6 +25,15 @@
                 </div>
             </article>
 
+            <!-- Mensaje de cuenta bloqueada por intentos fallidos (RNF-03) -->
+            <article class="mensaje mensaje-error" role="alert" th:if="${param.bloqueado}">
+                <span class="mensaje-icono" aria-hidden="true">✖</span>
+                <div class="mensaje-contenido">
+                    <h2>Cuenta bloqueada temporalmente</h2>
+                    <p>Se superaron los cinco intentos fallidos. Vuelva a intentarlo dentro de 15 minutos.</p>
+                </div>
+            </article>
+
             <!-- Mensaje después de cerrar sesión -->
             <article class="mensaje mensaje-exito" role="status" th:if="${param.salida}">
                 <span class="mensaje-icono" aria-hidden="true">✔</span>
@@ -44,6 +53,7 @@
             </article>
 
             <form id="form-login" method="post" action="mensajes.html" th:action="@{/login}">
+                <input type="hidden" name="_csrf" th:value="${csrfToken}">
                 <div class="campo">
                     <label for="codigo">Código de empleado</label>
                     <input type="text" id="codigo" name="codigo" autocomplete="username" required>

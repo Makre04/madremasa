@@ -5,7 +5,8 @@ import com.madremasa.repository.CierreVentaRepositorio;
 import com.madremasa.repository.InsumoRepositorio;
 import com.madremasa.repository.ProduccionRepositorio;
 import com.madremasa.repository.UsuarioRepositorio;
-import org.springframework.security.core.Authentication;
+import com.madremasa.sesion.ControlAcceso;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,18 +21,26 @@ public class PanelController {
     private final InsumoRepositorio insumoRepositorio;
     private final ProduccionRepositorio produccionRepositorio;
     private final CierreVentaRepositorio cierreRepositorio;
+    private final ControlAcceso controlAcceso;
 
     public PanelController(UsuarioRepositorio usuarioRepositorio, InsumoRepositorio insumoRepositorio,
-                           ProduccionRepositorio produccionRepositorio, CierreVentaRepositorio cierreRepositorio) {
+                           ProduccionRepositorio produccionRepositorio, CierreVentaRepositorio cierreRepositorio,
+                           ControlAcceso controlAcceso) {
         this.usuarioRepositorio = usuarioRepositorio;
         this.insumoRepositorio = insumoRepositorio;
         this.produccionRepositorio = produccionRepositorio;
         this.cierreRepositorio = cierreRepositorio;
+        this.controlAcceso = controlAcceso;
     }
 
     @GetMapping("/panel")
-    public String panel(Authentication autenticacion, Model modelo) {
-        usuarioRepositorio.findByCodigoEmpleado(autenticacion.getName())
+    public String panel(HttpSession sesion, Model modelo) {
+        // Cualquier usuario con sesión iniciada puede ver el panel
+        String acceso = controlAcceso.verificar(sesion);
+        if (acceso != null) return acceso;
+
+        String codigo = controlAcceso.codigoUsuario(sesion);
+        usuarioRepositorio.findByCodigoEmpleado(codigo)
                 .ifPresent(usuario -> modelo.addAttribute("usuario", usuario));
         modelo.addAttribute("insumosBajos", insumoRepositorio.buscarBajos());
         modelo.addAttribute("totalInsumos", insumoRepositorio.count());
@@ -40,7 +49,7 @@ public class PanelController {
                 .map(ResumenPuntoVenta::total)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         modelo.addAttribute("totalVentas", totalVentas);
-        modelo.addAttribute("misCierres", cierreRepositorio.findByUsuarioCodigoEmpleadoOrderByFechaDesc(autenticacion.getName()));
+        modelo.addAttribute("misCierres", cierreRepositorio.findByUsuarioCodigoEmpleadoOrderByFechaDesc(codigo));
         return "panel";
     }
 }
