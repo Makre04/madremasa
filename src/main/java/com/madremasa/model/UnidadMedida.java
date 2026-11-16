@@ -21,4 +21,12 @@ public class UnidadMedida {
     public Integer getIdUnidad() { return idUnidad; }
     public String getNombre() { return nombre; }
     public String getSimbolo() { return simbolo; }
+
+    public UnidadMedida() {
+    }
+
+    public UnidadMedida(String nombre, String simbolo) {
+        this.nombre = nombre;
+        this.simbolo = simbolo;
+    }
 }
