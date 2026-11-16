@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movimientos del insumo | Madre Masa</title>
+    <link rel="stylesheet" href="../../static/css/estilos.css" th:href="@{/css/estilos.css}">
+</head>
+<body>
+    <header th:replace="~{fragmentos/plantilla :: encabezado('insumos')}"></header>
+
+    <main class="contenedor contenedor-ancho">
+        <h1 th:text="${insumo.nombre}">Harina de trigo</h1>
+        <p>Existencia actual:
+            <strong><span th:text="${#numbers.formatDecimal(insumo.existencia, 1, 'POINT', 0, 'COMMA')}">3.000</span>
+            <span th:text="${insumo.unidad.simbolo}">g</span></strong>
+            · Mínimo: <span th:text="${#numbers.formatDecimal(insumo.cantidadMinima, 1, 'POINT', 0, 'COMMA')}">10.000</span>
+            <span th:text="${insumo.unidad.simbolo}">g</span>
+            <span th:if="${session.usuarioRol == 'ADMINISTRADOR'}">· Costo unitario: ₡<span
+                  th:text="${#numbers.formatDecimal(insumo.costoUnitario, 1, 'POINT', 4, 'COMMA')}">0,9500</span></span>
+            <span class="etiqueta etiqueta-baja" th:if="${insumo.bajo and insumo.activo}">Inventario bajo</span>
+        </p>
+
+        <div th:replace="~{fragmentos/plantilla :: mensajes}"></div>
+
+        <div class="formularios-dobles">
+            <!-- Entrada por compra (RF-09) -->
+            <section class="tarjeta-formulario">
+                <h2>Registrar entrada</h2>
+                <form th:action="@{/insumos/{id}/entrada(id=${insumo.idInsumo})}" method="post">
+                    <input type="hidden" name="_csrf" th:value="${csrfToken}">
+                    <div class="campo">
+                        <label for="cantidadEntrada">Cantidad (<span th:text="${insumo.unidad.simbolo}">g</span>)</label>
+                        <input type="number" id="cantidadEntrada" name="cantidad" min="0.001" step="0.001" required>
+                    </div>
+                    <div class="campo">
+                        <label for="costoTotal">Costo total de la compra (₡)</label>
+                        <input type="number" id="costoTotal" name="costoTotal" min="0" step="0.01" required>
+                    </div>
+                    <div class="acciones"><button type="submit">Registrar entrada</button></div>
+                </form>
+            </section>
+
+            <!-- Ajuste con motivo (RF-10), solo administrador -->
+            <section class="tarjeta-formulario" th:if="${session.usuarioRol == 'ADMINISTRADOR'}">
+                <h2>Registrar ajuste</h2>
+                <form th:action="@{/insumos/{id}/ajuste(id=${insumo.idInsumo})}" method="post">
+                    <input type="hidden" name="_csrf" th:value="${csrfToken}">
+                    <div class="campo">
+                        <label for="cantidadAjuste">Cantidad (negativa para restar)</label>
+                        <input type="number" id="cantidadAjuste" name="cantidad" step="0.001" required>
+                    </div>
+                    <div class="campo">
+                        <label for="motivo">Motivo</label>
+                        <input type="text" id="motivo" name="motivo" maxlength="200" placeholder="Merma, pérdida o corrección" required>
+                    </div>
+                    <div class="acciones"><button type="submit">Registrar ajuste</button></div>
+                </form>
+            </section>
+        </div>
+
+        <section class="bloque">
+            <h2>Historial de movimientos</h2>
+            <div class="tabla-contenedor">
+                <table class="tabla">
+                    <thead>
+                        <tr><th>Fecha</th><th>Tipo</th><th class="numero">Cantidad</th>
+                            <th th:if="${session.usuarioRol == 'ADMINISTRADOR'}" class="numero">Costo total</th>
+                            <th>Detalle</th><th>Usuario</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="m : ${movimientos}">
+                            <td th:text="${#temporals.format(m.fecha, 'dd/MM/yyyy HH:mm')}">05/11/2026 08:00</td>
+                            <td th:text="${m.tipoVisible}">Entrada</td>
+                            <td class="numero"><span th:text="${#numbers.formatDecimal(m.cantidad, 1, 'POINT', 0, 'COMMA')}">9.000</span>
+                                <span th:text="${insumo.unidad.simbolo}">g</span></td>
+                            <td th:if="${session.usuarioRol == 'ADMINISTRADOR'}" class="numero">
+                                <span th:if="${m.costoTotal != null}">₡<span th:text="${#numbers.formatDecimal(m.costoTotal, 1, 'POINT', 2, 'COMMA')}">8.550,00</span></span>
+                            </td>
+                            <td th:text="${m.motivo != null} ? ${m.motivo} : (${m.produccion != null} ? ${'Producción #' + m.produccion.idProduccion} : '')">Compra</td>
+                            <td th:text="${m.usuario.codigoEmpleado}">EMP-002</td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(movimientos)}"><td colspan="6">Este insumo todavía no tiene movimientos.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <a class="enlace-volver" th:href="@{/insumos}" href="lista.html">← Volver a insumos</a>
+    </main>
+
+    <footer th:replace="~{fragmentos/plantilla :: pie}"></footer>
+</body>
+</html>

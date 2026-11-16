@@ -8,7 +8,7 @@ import com.madremasa.repository.UnidadMedidaRepositorio;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-// Registro y edición de insumos (RF-08)
+// Registro, edición y eliminación de insumos (RF-08)
 @Service
 public class InsumoService {
 
@@ -57,5 +57,12 @@ public class InsumoService {
         formulario.setCostoUnitario(insumo.getCostoUnitario());
         formulario.setActivo(insumo.getActivo());
         return formulario;
+    }
+
+    // Elimina el insumo; flush() obliga a SQL Server a revisar las llaves foráneas en este momento
+    @Transactional
+    public void eliminar(Integer idInsumo) {
+        insumoRepositorio.deleteById(idInsumo);
+        insumoRepositorio.flush();
     }
 }
