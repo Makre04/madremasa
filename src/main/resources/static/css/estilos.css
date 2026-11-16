@@ -680,3 +680,104 @@ button[type="submit"]:focus-visible {
         padding: 10px;
     }
 }
+
+/* Botón para eliminar un insumo dentro de la tabla (se ve como un enlace) */
+.form-eliminar {
+    display: inline;
+    margin-left: 10px;
+}
+
+.form-eliminar .enlace-eliminar {
+    width: auto;
+    margin: 0;
+    padding: 0;
+    font-size: inherit;
+    font-weight: normal;
+    color: #B03A2E;
+    background: none;
+    border: none;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.form-eliminar .enlace-eliminar:hover {
+    color: #7B241C;
+    background: none;
+    box-shadow: none;
+}
+
+/* Casillas de los días de operación de un punto de venta */
+.dias-operacion {
+    border: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 18px;
+}
+
+.dias-operacion legend {
+    font-weight: 600;
+    margin-bottom: 8px;
+    padding: 0;
+}
+
+.dias-operacion .dia {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: normal;
+    margin: 0;
+}
+
+.dias-operacion .dia input {
+    width: auto;
+}
+
+/* Bloque de formulario secundario dentro de una página de detalle */
+.formularios-dobles {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-top: 24px;
+}
+
+.formularios-dobles .tarjeta-formulario {
+    margin: 0;
+}
+
+.formularios-dobles h2 {
+    font-size: 18px;
+    margin-top: 0;
+    color: var(--color-principal);
+}
+
+@media (max-width: 700px) {
+    .formularios-dobles {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Botón para confirmar la producción dentro del mensaje de éxito */
+.form-confirmar {
+    margin-top: 10px;
+}
+
+.form-confirmar button[type="submit"] {
+    width: auto;
+    padding: 10px 20px;
+}
+
+/* Campo numérico angosto dentro de una tabla */
+.entrada-corta {
+    width: 110px;
+    padding: 8px;
+    text-align: right;
+    border: 1px solid var(--color-borde-gris);
+    border-radius: 6px;
+}
+
+/* Productos vendidos de un cierre, uno por línea */
+.detalle-cierre {
+    display: block;
+    font-size: 14px;
+}
